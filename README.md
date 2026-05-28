@@ -8,23 +8,20 @@ As ruas usadas no trabalho foram extraídas do OpenStreetMap na área entre Rua
 Andrade Neves, Rua Doutor Campos, Avenida Visconde de Mauá e Rua Doutor
 Monteiro.
 
-
 No arquivo `grafo_arroio_grande.py`, cada nó é um ponto real do OpenStreetMap
 e cada aresta é um trecho de rua com nome, distância aproximada e `way_id`.
 Assim, o caminho não pula de uma rua para outra: ele passa pelos trechos reais.
 
-O programa compara:
+O programa compara três algoritmos de busca aplicados entre dois pontos distintos
+do grafo: `Casa do Paciente` e `Hospital Santa Casa`.
 
-- `BFS`: busca às cegas;
+Os algoritmos implementados são:
+
+- `BFS`: busca em largura, uma busca às cegas que percorre o grafo por camadas;
+- `DFS`: busca em profundidade, uma busca às cegas que explora um caminho até o fim antes de voltar;
 - `A*`: busca informada por uma heurística de proximidade até a Santa Casa.
 
 ## Como executar
 
 ```bash
 python3 main.py
-```
-
-## Arquivos
-
-- `main.py`: BFS, A*, formatação da rota e demonstração.
-- `grafo_arroio_grande.py`: nós, trechos reais, coordenadas e ruas bloqueadas.
