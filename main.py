@@ -19,9 +19,6 @@ def obter_vizinhos(grafo, no):
 
 '''
 Busca em largura (BFS).
-
-A BFS e uma busca as cegas, pois nao usa heuristica. Ela percorre os trechos
-por camadas e ignora ruas bloqueadas.
 '''
 def busca_bfs(grafo, inicio, objetivo, bloqueios):
     fila = deque([(inicio, [inicio], 0)])
@@ -42,6 +39,38 @@ def busca_bfs(grafo, inicio, objetivo, bloqueios):
             if vizinho not in visitados:
                 visitados.add(vizinho)
                 fila.append((vizinho, caminho + [vizinho], custo + distancia))
+
+    return None, 0, ordem_visitados
+
+
+'''
+Busca em profundidade (DFS).
+'''
+def busca_dfs(grafo, inicio, objetivo, bloqueios):
+    pilha = [(inicio, [inicio], 0)]
+    visitados = set()
+    ordem_visitados = []
+
+    while pilha:
+        no_atual, caminho, custo = pilha.pop()
+
+        if no_atual in visitados:
+            continue
+
+        visitados.add(no_atual)
+        ordem_visitados.append(no_atual)
+
+        if no_atual == objetivo:
+            return caminho, custo, ordem_visitados
+
+        # A lista e invertida para manter uma ordem de visita parecida com a ordem
+        # em que os vizinhos aparecem no dicionario do grafo.
+        for vizinho, distancia, rua in reversed(obter_vizinhos(grafo, no_atual)):
+            if rua in bloqueios:
+                continue
+
+            if vizinho not in visitados:
+                pilha.append((vizinho, caminho + [vizinho], custo + distancia))
 
     return None, 0, ordem_visitados
 
@@ -150,6 +179,13 @@ def main():
         ruas_bloqueadas
     )
 
+    caminho_dfs, custo_dfs, visitados_dfs = busca_dfs(
+        mapa_arroio_grande,
+        inicio,
+        objetivo,
+        ruas_bloqueadas
+    )
+
     caminho_astar, custo_astar, visitados_astar = busca_a_estrela(
         mapa_arroio_grande,
         heuristica_hospital,
@@ -166,23 +202,31 @@ def main():
     print('\n--- BFS ---')
     exibir_resultado('', caminho_bfs, custo_bfs, visitados_bfs)
 
+    print('\n--- DFS ---')
+    exibir_resultado('', caminho_dfs, custo_dfs, visitados_dfs)
+
     print('\n--- A* ---')
     exibir_resultado('', caminho_astar, custo_astar, visitados_astar)
 
     print('\n--- Comparacao ---')
     print(f'BFS analisou {len(visitados_bfs)} nos.')
+    print(f'DFS analisou {len(visitados_dfs)} nos.')
     print(f'A* analisou {len(visitados_astar)} nos.')
     print(f'Distancia da rota BFS: {custo_bfs:.0f} metros')
+    print(f'Distancia da rota DFS: {custo_dfs:.0f} metros')
     print(f'Distancia da rota A*: {custo_astar:.0f} metros')
 
     if len(visitados_astar) < len(visitados_bfs):
-        print('O A* visitou menos nos porque usou a distancia em linha reta ate a Santa Casa.')
+        print('O A* visitou menos nos que a BFS porque usou a distancia em linha reta ate a Santa Casa.')
     else:
-        print('Neste caso, os algoritmos tiveram desempenho parecido.')
+        print('Neste caso, BFS e A* tiveram desempenho parecido em quantidade de nos analisados.')
 
     if custo_astar < custo_bfs:
         diferenca = custo_bfs - custo_astar
-        print(f'A rota do A* tambem ficou {diferenca:.0f} metros mais curta que a rota da BFS.')
+        print(f'A rota do A* ficou {diferenca:.0f} metros mais curta que a rota da BFS.')
+
+    if custo_dfs > custo_astar:
+        print('A DFS encontrou um caminho valido, mas nao garante a menor distancia total.')
 
 
 if __name__ == '__main__':
